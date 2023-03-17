@@ -1,0 +1,5 @@
+Hi there ✌️
+Here some commands which You can use with me:
+
+/start - starts the bot
+/clear - clear all chat
