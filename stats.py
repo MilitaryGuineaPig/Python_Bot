@@ -43,8 +43,6 @@ with open("user_info.txt", "w") as f:
     f.write(f"Git nickname: {git_nickname}\n")
     f.write(f"Education: {education}\n")
     f.write(f"\t\tBrief Information\n")
-    f.write(f"GitHub was registered in september 1992, first contribution was pushed in august 2004. {full_name} has {followers_text} followers regarding to today’s date ({current_date}).\n")
-    f.write(f"Brief Information: \n")
     f.write(f"GitHub was registered in {registration}, first contribution was pushed in august 2004. {full_name} has {followers_text} followers regarding to today’s date ({current_date}).\n")
     f.write(f"Current user is considered active. Detailed information is shown on graphs bellow:\n")
     f.write(f"\nGraph activity for last 3 month\n")
