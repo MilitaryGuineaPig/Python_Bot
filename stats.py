@@ -3,10 +3,9 @@ from bs4 import BeautifulSoup
 import sys
 import datetime
 
-link = sys.argv[1]
-
+# link = sys.argv[1]
+link = "https://www.linkedin.com/in/vladpallah/"
 response = requests.get(link)
-
 soup = BeautifulSoup(response.content, 'html.parser')
 
 full_name_elem = soup.find('span', class_='p-name vcard-fullname d-block overflow-hidden')
