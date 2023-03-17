@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import sys
 import datetime
-from dateutil import parser
 
 # link = sys.argv[1]
 link = "https://www.linkedin.com/in/vladpallah/"
@@ -17,7 +16,7 @@ git_nickname = link.split("/")[-1]
 url = f'https://api.github.com/users/{git_nickname}'
 response = requests.get(url)
 user_data = response.json()
-registration_date =  parser.parse(user_data['created_at']).date()
+registration_date = user_data['created_at']
 registration_date = registration_date.text.strip() if registration_date else None
 
 
