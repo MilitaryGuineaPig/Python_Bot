@@ -126,8 +126,12 @@ def get_youtube_link(message):
 
 # Check the stats of the GitHub repository
 def check_stats(message):
-    if 1>2:
-        print("loh")
+    github_link = message.text
+    if github_link.startswith("https://github.com/") or github_link.startswith("github.com/"):
+        # Run the pars_git.py script and capture its output
+        output = subprocess.check_output(['python', 'stats.py', github_link]).decode()
+        # Send the output as a message
+        bot.send_message(message.chat.id, output, reply_markup=keyboard2)
     else:
         bot.send_message(message.chat.id,
                          "Please enter a valid GitHub link starting with 'https://github.com/' or 'github.com/'",
