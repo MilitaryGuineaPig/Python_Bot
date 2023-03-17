@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import sys
 
 # Define the URL of the GitHub page to parse
-link = sys.argv[1]
+link = sys.arwgv[1]
 # Send a GET request to the URL and store the response
 response = requests.get(link)
 # Parse the HTML content of the response using BeautifulSoup
