@@ -30,7 +30,6 @@ print('GitHub Nickname:', git_nickname)
 print('Education:', education)
 print('Number of Followers:', followers_text)
 print('Current Date:', current_date)
-print('CV Link:', cv_link)
 # Create a new text file and write the information to it
 with open("user_info.txt", "w") as f:
     f.write(f"\t\t{full_name}'s dossier\n\n")
@@ -41,4 +40,3 @@ with open("user_info.txt", "w") as f:
     f.write(f"GitHub was registered in september 1992, first contribution was pushed in august 2004. {full_name} has {followers_text} followers regarding to today’s date ({current_date}).\n")
     f.write(f"Current user is considered active. Detailed information is shown on graphs bellow:\n")
     f.write(f"\nGraph activity for last 3 month\n")
-    f.write(f"\nCV: {cv_link}")
