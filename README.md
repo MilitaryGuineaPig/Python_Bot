@@ -10,7 +10,7 @@ I made this bot using Python.
 Functionality:
 
  - Bot bio
- ![Registration](https://github.com/MilitaryGuineaPig/Python_Bot/blob/main/ReadMeImages/Bot_info.PNG)
+ ![Registration](https://github.com/MilitaryGuineaPig/Python_Bot/blob/main/ReadMeImages/Bot_Info.PNG)
  
  - Load your X-ray
   ![Registration](https://github.com/MilitaryGuineaPig/Python_Bot/blob/main/ReadMeImages/Bot_info.png)
