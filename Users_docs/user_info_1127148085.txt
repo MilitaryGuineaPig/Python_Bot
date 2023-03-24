@@ -1,0 +1,30 @@
+Vladyslav's dossier
+
+Full Name: Vladyslav Pallah
+Type of employment: Student at University of Lodz 
+Skills:
+ 1) Linux 
+ 2) C# 
+ 3) Front-End Development 
+ 4) MySQL 
+ 5) Object-Oriented Programming (OOP) 
+ 6) Software Design Patterns 
+ 7) Algorithms 
+ 8) Qt 
+ 9) English 
+ 10) Analytical Skills 
+ 11) Communication 
+ 12) C++ 
+ 13) Microsoft Office 
+ 14) Russian 
+ 15) Ukrainian 
+ 16) Mathematics 
+Education:
+#1: University of Lodz 
+#2: Hillel IT School 
+Location: Poland Łódź, Łódzkie
+About:
+Hey! I am an undergraduate student in Mathematics and Computer Science.
+💻 I'm currently learning Python ML
+🌟I have experience with C++, Qt, Linux and enjoy working on various projects.
+🤙I am always looking to expand my knowledge and skills in programming. 

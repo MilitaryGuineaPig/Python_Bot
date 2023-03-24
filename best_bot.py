@@ -42,7 +42,7 @@ chart_press = telebot.types.InlineKeyboardButton(chart_button_label, callback_da
 menu_press = telebot.types.InlineKeyboardButton(menu_button_label, callback_data=menu_btn_pl)
 # Define your 1 keyboard
 keyboard1 = telebot.types.InlineKeyboardMarkup(row_width=1)
-keyboard1.add(github_press, linkedin_press, pdf_press)
+keyboard1.add(github_press, linkedin_press)
 # Define your 2 keyboard
 keyboard2 = telebot.types.InlineKeyboardMarkup(row_width=1)
 keyboard2.add(menu_press)
@@ -151,7 +151,7 @@ def png_gen(chat_id):
         text = f.read()
     # Define the image dimensions and font
     img_width, img_height = 800, 800
-    font = ImageFont.truetype("arial.ttf", 14)
+    font = ImageFont.truetype("arial.ttf", 17)
     # Create a new image and draw the text on it
     img = Image.new("RGB", (img_width, img_height), color=(255, 255, 255))
     draw = ImageDraw.Draw(img)
@@ -211,6 +211,6 @@ def del_dir():
             print(f"Error deleting file: {file_path}. {e}")
 
 
-del_dir()
+# del_dir()
 # Start the bot
 bot.polling()
