@@ -1,6 +1,11 @@
-import telebot
+import io
+import os
+import re
 import subprocess
 from linkedin_api import Linkedin
+import telebot
+from PIL import Image, ImageDraw, ImageFont
+from fpdf import FPDF
 
 with open('/Users/monkey/Public/Python/Hidden files/LinkedIn_Bot.txt', 'r') as file:
     key = file.readline().rstrip('\n')
@@ -37,7 +42,7 @@ chart_press = telebot.types.InlineKeyboardButton(chart_button_label, callback_da
 menu_press = telebot.types.InlineKeyboardButton(menu_button_label, callback_data=menu_btn_pl)
 # Define your 1 keyboard
 keyboard1 = telebot.types.InlineKeyboardMarkup(row_width=1)
-keyboard1.add(github_press, linkedin_press)
+keyboard1.add(github_press, linkedin_press, pdf_press)
 # Define your 2 keyboard
 keyboard2 = telebot.types.InlineKeyboardMarkup(row_width=1)
 keyboard2.add(menu_press)
@@ -62,13 +67,11 @@ def handle_button_tap(call):
         bot.send_message(call.message.chat.id, "Please enter a valid LinkedIn link:", reply_markup=keyboard2)
         bot.register_next_step_handler(call.message, get_linkedin_link)
     elif call.data == png_btn_pl:
-        bot.send_message(call.message.chat.id, "PNG...", reply_markup=keyboard2)
-        bot.register_next_step_handler(call.message, png_gen)
+        png_gen(call.message.chat.id)
     elif call.data == pdf_btn_pl:
-        bot.send_message(call.message.chat.id, "PDF...", reply_markup=keyboard2)
-        bot.register_next_step_handler(call.message, pdf_gen)
+        pdf_gen(call.message.chat.id)
     elif call.data == chart_btn_pl:
-        bot.send_message(call.message.chat.id, "Chart...", reply_markup=keyboard2)
+        bot.send_message(call.message.chat.id, "CHART is DONE!", reply_markup=keyboard2)
         bot.register_next_step_handler(call.message, chart_gen)
     elif call.data == menu_btn_pl:
         bot.send_message(call.message.chat.id, "\tMenu!\n Choose the site:", reply_markup=keyboard1)
@@ -103,11 +106,11 @@ def get_linkedin_link(message):
         # GET a profile
         profile = api.get_profile(username)
         # Writing data
-        with open(f"user_info_{message.chat.id}.txt", "w") as f:
-            f.write(f"\t\t{profile['firstName']}'s dossier\n\n")
+        with open(f"/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{message.chat.id}.txt", "w") as f:
+            f.write(f"{profile['firstName']}'s dossier\n\n")
             f.write(f"Full Name: {profile['firstName']} {profile['lastName']}\n")
             f.write(f"Type of employment: {profile['headline']} \n")
-            f.write(f"\t\tSkills:\n")
+            f.write(f"Skills:\n")
             counter = 0
             for edu in profile['skills']:
                 if 'name' in edu:
@@ -117,7 +120,7 @@ def get_linkedin_link(message):
                 else:
                     print("No school information available")
             counter = 0
-            f.write(f"\t\tEducation:\n")
+            f.write(f"Education:\n")
             for edu in profile['education']:
                 if 'school' in edu:
                     counter = counter + 1
@@ -126,12 +129,14 @@ def get_linkedin_link(message):
                 else:
                     print("No school information available")
             f.write(f"Location: {profile['locationName']} {profile['geoLocationName']}\n")
-            f.write(f"\t\tBrief Information\n")
+            f.write(f"About:\n")
             f.write(f"{profile['summary']} \n")
+
         # Sending a file
         bot.send_document(chat_id=message.chat.id,
-                          document=open(f'/Users/monkey/Public/Python/Python_Bot/user_info_{message.chat.id}.txt',
-                                        'rb'))
+                          document=open(
+                              f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{message.chat.id}.txt',
+                              'rb'))
 
         bot.send_message(message.chat.id, "Choose another format or return :)", reply_markup=keyboard3)
     else:
@@ -140,18 +145,72 @@ def get_linkedin_link(message):
         bot.register_next_step_handler(message, get_linkedin_link)
 
 
-def png_gen():
+def png_gen(chat_id):
+    linkedin_file_path = f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.txt'
+    with open(linkedin_file_path, "r") as f:
+        text = f.read()
+    # Define the image dimensions and font
+    img_width, img_height = 800, 800
+    font = ImageFont.truetype("arial.ttf", 14)
+    # Create a new image and draw the text on it
+    img = Image.new("RGB", (img_width, img_height), color=(255, 255, 255))
+    draw = ImageDraw.Draw(img)
+    draw.text((10, 10), text, font=font, fill=(0, 0, 0))
+    # Save the image to a BytesIO object
+    img_bytes = io.BytesIO()
+    img.save(img_bytes, format="PNG")
+    img_bytes.seek(0)
+    # Send the image to the chat
+    bot.send_photo(chat_id, img_bytes)
+    bot.send_message(chat_id, "Try another link:", reply_markup=keyboard1)
 
-   print("hi")
 
-
-def pdf_gen():
-    print("pdf")
+def pdf_gen(chat_id):
+    linkedin_file_path = f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.txt'
+    # Open the input file for reading
+    with open(linkedin_file_path, 'r') as input_file:
+        # Read the contents of the file
+        text = input_file.read()
+    # Remove non-ASCII characters from the text
+    text = remove_non_ascii(text)
+    # save FPDF() class into
+    # a variable pdf
+    pdf = FPDF()
+    # Add a page
+    pdf.add_page()
+    # set style and size of font
+    # that you want in the pdf
+    pdf.set_font("Arial", size=15)
+    # insert the texts in pdf
+    for line in text.split('\n'):
+        pdf.cell(200, 10, txt=line, ln=1, align='C')
+    # save the pdf with name .pdf
+    pdf.output(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.pdf')
+    # Sending a file
+    bot.send_document(chat_id,
+                      document=open(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.pdf', 'rb'))
+    bot.send_message(chat_id, "Try another link:", reply_markup=keyboard1)
 
 
 def chart_gen():
     print("chart")
 
 
+def remove_non_ascii(text):
+    return re.sub(r'[^\x00-\x7F]+', '', text)
+
+
+def del_dir():
+    directory = "/Users/monkey/Public/Python/Python_Bot/Users_docs"
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Error deleting file: {file_path}. {e}")
+
+
+del_dir()
 # Start the bot
 bot.polling()

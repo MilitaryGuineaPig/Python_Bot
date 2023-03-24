@@ -16,7 +16,7 @@ contact_info = api.get_profile_contact_info(username)
 # GET all connected profiles (1st, 2nd and 3rd degree) of a given profile
 connections = api.get_profile_connections('1234asc12304')
 
-with open("user_info.txt", "w") as f:
+with open("Users_docs/user_info.txt", "w") as f:
     f.write(f"\t\t{profile['firstName']}'s dossier\n\n")
     f.write(f"Full Name: {profile['firstName']} {profile['lastName']}\n")
     f.write(f"Type of employment: {profile['headline']} \n")
