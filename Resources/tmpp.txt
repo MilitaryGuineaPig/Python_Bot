@@ -1,0 +1,137 @@
+"""def gitHubFilll(message):
+    url = message.text
+    response = requests.get(url)
+
+    doc = docx.Document('/Users/monkey/Public/Python/Python_Bot/template.docx')
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+    # Extract the name of the GitHub user or organization
+    name_elem = soup.find('span', class_='p-name vcard-fullname d-block overflow-hidden')
+    username = name_elem.text.strip() if name_elem else None
+
+    # Find the element that contains the number of followers and extract the text
+    followers_elem = soup.find('a', {'href': f'/{username}?tab=followers'})
+    followers_num = followers_elem.find('span', {'class': 'text-bold'}).text.strip() if followers_elem else None
+
+    # Extract the number of repositories
+    num_repos_elem = soup.find('span', class_='Counter')
+    repos_num = num_repos_elem.text.strip() if num_repos_elem else None
+    profname = username
+    url = f"https://api.github.com/users/{username}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        image_url = data["avatar_url"]
+        # Make a GET request to the image URL and save the image to a file
+        image_response = requests.get(image_url)
+        with open(f"/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png", "wb") as f:
+            f.write(image_response.content)
+    else:
+        print(f"Failed to download profile image for {username}. Status code: {response.status_code}")
+
+    # Insert the image at the center of the first line
+    first_paragraph = doc.paragraphs[0]
+    run = first_paragraph.add_run()
+    # Open the image file
+    img = Image.open(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png')
+    # Convert the image to PNG format
+    img = img.convert('RGB')
+    # Save the image as a PNG file
+    img.save(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png', 'PNG')
+    run.add_picture(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png', width=Cm(4),
+                    height=Cm(4))
+    run.alignment = 1  # Set the alignment to center
+
+    # Loop through all paragraphs in the document
+    for paragraph in doc.paragraphs:
+        if '<username>' in paragraph.text:
+            paragraph.text = paragraph.text.replace('<username>', username)
+        if '<repos_num>' in paragraph.text:
+            paragraph.text = paragraph.text.replace('<repos_num>', repos_num)
+        if '<followers_num>' in paragraph.text:
+            paragraph.text = paragraph.text.replace('<followers_num>', "followers_num")
+
+    # Insert the image at the end of the last line
+    last_paragraph = doc.paragraphs[-1]
+    run = last_paragraph.add_run()
+
+    subprocess.run(['python', 'add_stat.py', profname])
+
+    run.add_picture(f'Im_Stat_{profname}.png', width=Cm(12), height=Cm(6))
+    run.add_break()
+    run.alignment = 1  # Set the alignment to center
+
+    # Save the modified document
+    doc.save(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{message.chat.id}.docx')
+"""
+
+    """# Replace "YOUR_GITHUB_USERNAME" with the username of the user you want to retrieve information for
+    username = "VladosCavalera"
+    # Authenticate with GitHub using a personal access token
+    g = github.Github("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")
+
+    # Get the user object for the specified username
+    user = g.get_user(username)
+
+    # Retrieve the user's information
+    num_stars = user.get_starred().totalCount
+    num_followers = user.followers
+    num_following = user.following
+    num_repos = user.public_repos
+    profile_image_url = user.avatar_url
+
+    # Print the user's information
+    print("Username: ", username)
+    print("Number of stars: ", num_stars)
+    print("Number of followers: ", num_followers)
+    print("Number of following: ", num_following)
+    print("Number of repositories: ", num_repos)
+    print("Profile image URL: ", profile_image_url)"""
+
+
+def get_all_commits_by_userr(username, g):
+    # Get the user object
+    user = g.get_user(username)
+    # Get all repositories of the user
+    repos = user.get_repos()
+    # Initialize an empty dictionary to store the commits by week
+    commits_by_week = {}
+    # Initialize the start of week variable
+    start_of_week = None
+    # Iterate through all repositories
+    for repo in repos:
+        # Get all commits in the repository
+        commits = repo.get_commits(author=username)
+        # Iterate through all commits
+        for commit in commits:
+            # Get the week number of the commit date
+            week_num = commit.commit.author.date.isocalendar()[1]
+            # Get the year of the commit date
+            year = commit.commit.author.date.year
+            # Create a datetime object for the start of the week
+            start_of_week = datetime.datetime.strptime(f'{year}-W{week_num-1}-1', '%G-W%V-%u').date()
+            # Add the commit to the commits_by_week dictionary
+            if start_of_week not in commits_by_week:
+                commits_by_week[start_of_week] = 1
+            else:
+                commits_by_week[start_of_week] += 1
+    # Convert the dictionary to a list of tuples
+    if start_of_week:
+        commits_list = [(week, commits_by_week[week]) if week in commits_by_week else (week, 0) for week in
+                        [start_of_week + datetime.timedelta(days=7 * i) for i in range(52)]]
+
+
+        # Create a list of week numbers and a list of commit counts
+        week_nums = [week_num for week_num, _ in commits_list]
+        commit_counts = [commit_count for _, commit_count in commits_list]
+        # Plot the data
+        plt.plot(week_nums, commit_counts)
+        plt.title('Commits by Week')
+        plt.xlabel('Week Number')
+        plt.ylabel('Number of Commits')
+        # Save the plot to a file
+        plt.savefig(f'Users_docs/Im_Stat_{username}.png')
+
+        return commits_list
+    else:
+        return []

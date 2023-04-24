@@ -1,9 +1,3 @@
-MilitaryGuineaPig
-
-create a map which store the weeks and then add there all comits from each repo and output the nap
-
-----
-
 import requests
 from datetime import datetime, timedelta
 
@@ -74,4 +68,5 @@ if response.status_code == 200:
         print("Inactive user")
 
 else:
+    print(response.status_code)
     print(f"Failed to retrieve repository information for {username}")

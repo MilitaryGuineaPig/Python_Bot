@@ -1,5 +1,68 @@
-Hi there ✌️
-Here some commands which You can use with me:
+from datetime import datetime
+import requests
 
-/start - starts the bot
-/clear - clear all chat
+# User details
+username = "MilitaryGuineaPig"
+
+# GitHub API endpoint for retrieving user repositories
+endpoint = f"https://api.github.com/users/{username}/repos"
+
+# Make request to the GitHub API
+response = requests.get(endpoint)
+
+if 200 == 200:
+    # Parse the response JSON
+    repos = response.json()
+
+    # Iterate through the repositories
+    for repo in repos:
+        # Get the name of the repository
+        repo_name = repo["name"]
+
+        # Get the GitHub API endpoint for retrieving commit activity for this repository
+        repo_endpoint = f"https://api.github.com/repos/{username}/{repo_name}/stats/commit_activity"
+
+        # Make request to the GitHub API for this repository
+        repo_response = requests.get(repo_endpoint)
+
+        if repo_response.status_code == 200:
+            # Parse the response JSON
+            repo_data = repo_response.json()
+
+            # Get the date of the user's first commit in this repository
+            first_commit_date = datetime.fromtimestamp(repo_data[0]["week"])
+
+            # Initialize variables for tracking commit activity
+            weekly_commits = []
+            weekly_start_dates = []
+
+            # Iterate through the weekly commit activity data for this repository
+            for weekly_commit_data in repo_data:
+                # Calculate the start date of this week
+                week_start_date = datetime.fromtimestamp(weekly_commit_data["week"])
+
+                # Calculate the number of commits for this week
+                weekly_commit_count = weekly_commit_data["total"]
+
+                # Add the weekly commit count and start date to their respective lists
+                weekly_commits.append(weekly_commit_count)
+                weekly_start_dates.append(week_start_date)
+
+            # Print the commit activity for this repository
+            print(f"Repository: {repo_name}")
+            print("Week\tCommits")
+            for i in range(len(weekly_commits)):
+                week_start_date_str = weekly_start_dates[i].strftime("%Y-%m-%d")
+                commit_count = weekly_commits[i]
+                print(f"{week_start_date_str}\t{commit_count}")
+
+            # Make a decision about the user's activity in this repository
+            total_commits = sum(weekly_commits)
+            weeks_since_first_commit = (datetime.now() - first_commit_date).days / 7
+            commits_per_week = total_commits / weeks_since_first_commit
+            if commits_per_week >= 1:
+                print("Active user")
+            else:
+                print("Inactive user")
+
+            print("")

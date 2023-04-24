@@ -1,16 +1,16 @@
-import io
 import os
 import re
+import datetime
+import pypandoc
 from linkedin_api import Linkedin
 import telebot
-from PIL import Image, ImageDraw, ImageFont
-from fpdf import FPDF
+from PIL import Image
 from bs4 import BeautifulSoup
 import docx
 from docx.shared import Cm
 import requests
-from io import BytesIO
-from PIL import Image
+from matplotlib import pyplot as plt
+
 
 with open('/Users/monkey/Public/Python/Hidden files/LinkedIn_Bot.txt', 'r') as file:
     key = file.readline().rstrip('\n')
@@ -52,7 +52,7 @@ keyboard2 = telebot.types.InlineKeyboardMarkup(row_width=1)
 keyboard2.add(menu_press)
 # Define your 3 keyboard
 keyboard3 = telebot.types.InlineKeyboardMarkup(row_width=2)
-keyboard3.add(png_press, pdf_press, menu_press)
+keyboard3.add(png_press, menu_press)
 # Define your 4 keyboard
 keyboard4 = telebot.types.InlineKeyboardMarkup(row_width=1)
 keyboard4.add(next_press)
@@ -70,12 +70,10 @@ def handle_button_tap(call):
     if call.data == start_btn_pl:
         bot.send_message(call.message.chat.id, "Please enter a valid GitHub link:", reply_markup=keyboard2)
         bot.register_next_step_handler(call.message, get_github_link)
-
     elif call.data == next_btn_pl:
         bot.send_message(call.message.chat.id, "First part done! \nPlease enter a valid LinkedIn link:",
                          reply_markup=keyboard2)
         bot.register_next_step_handler(call.message, get_linkedin_link)
-
     elif call.data == png_btn_pl:
         png_gen(call.message.chat.id)
     elif call.data == pdf_btn_pl:
@@ -87,14 +85,11 @@ def handle_button_tap(call):
     bot.edit_message_reply_markup(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=None)
 
 
-# GitHub part
-
 def get_github_link(message):
     github_link = message.text
     if github_link.startswith("https://github.com/") or github_link.startswith("github.com/"):
         # Open the Word document
         doc = docx.Document('/Users/monkey/Public/Python/Python_Bot/template.docx')
-
         # Replace the link with the URL of the image you want to download
         url = github_link
         response = requests.get(url)
@@ -112,13 +107,12 @@ def get_github_link(message):
 
         url = f"https://api.github.com/users/{username}"
         response = requests.get(url)
-
         if response.status_code == 200:
             data = response.json()
             image_url = data["avatar_url"]
             # Make a GET request to the image URL and save the image to a file
             image_response = requests.get(image_url)
-            with open(f"profile_img_{message.chat.id}.png", "wb") as f:
+            with open(f"/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png", "wb") as f:
                 f.write(image_response.content)
         else:
             print(f"Failed to download profile image for {username}. Status code: {response.status_code}")
@@ -127,12 +121,12 @@ def get_github_link(message):
         first_paragraph = doc.paragraphs[0]
         run = first_paragraph.add_run()
         # Open the image file
-        img = Image.open(f'profile_img_{message.chat.id}.png')
+        img = Image.open(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png')
         # Convert the image to PNG format
         img = img.convert('RGB')
         # Save the image as a PNG file
-        img.save(f'profile_img_{message.chat.id}.png', 'PNG')
-        run.add_picture(f'profile_img_{message.chat.id}.png', width=Cm(2), height=Cm(2))
+        img.save(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png', 'PNG')
+        run.add_picture(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/profile_img_{message.chat.id}.png', width=Cm(4), height=Cm(4))
         run.alignment = 1  # Set the alignment to center
 
         # Loop through all paragraphs in the document
@@ -147,7 +141,13 @@ def get_github_link(message):
         # Insert the image at the end of the last line
         last_paragraph = doc.paragraphs[-1]
         run = last_paragraph.add_run()
-        run.add_picture('plot_user.jpg', width=Cm(6), height=Cm(3))
+
+        import subprocess
+
+        # Run the 'my_script.py' file with 'my_var' as a command-line argument
+        subprocess.run(['python', 'add_stat.py', username])
+
+        run.add_picture(f'Im_Stat_{username}.png', width=Cm(12), height=Cm(6))
         run.add_break()
         run.alignment = 1  # Set the alignment to center
 
@@ -155,7 +155,6 @@ def get_github_link(message):
         doc.save(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{message.chat.id}.docx')
 
         bot.send_message(message.chat.id, "Done, click NEXT button!", reply_markup=keyboard4)
-
 
     else:
         bot.send_message(message.chat.id,
@@ -225,8 +224,8 @@ def get_linkedin_link(message):
                           document=open(
                               f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{message.chat.id}.docx',
                               'rb'))
-
-        bot.send_message(message.chat.id, "Choose another format or return :)", reply_markup=keyboard3)
+        os.system("touch " + "/Users/monkey/Public/Python/Python_Bot/Users_docs")
+        bot.send_message(message.chat.id, "Start new :)", reply_markup=keyboard1)
 
     else:
         bot.send_message(message.chat.id, "Please enter a valid LinkedIn link starting with 'https://www.linkedin.com/'"
@@ -235,50 +234,21 @@ def get_linkedin_link(message):
 
 
 def png_gen(chat_id):
-    linkedin_file_path = f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.txt'
-    with open(linkedin_file_path, "r") as f:
-        text = f.read()
-    # Define the image dimensions and font
-    img_width, img_height = 800, 800
-    font = ImageFont.truetype("arial.ttf", 17)
-    # Create a new image and draw the text on it
-    img = Image.new("RGB", (img_width, img_height), color=(255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    draw.text((10, 10), text, font=font, fill=(0, 0, 0))
-    # Save the image to a BytesIO object
-    img_bytes = io.BytesIO()
-    img.save(img_bytes, format="PNG")
-    img_bytes.seek(0)
-    # Send the image to the chat
-    bot.send_photo(chat_id, img_bytes)
+
     bot.send_message(chat_id, "Try another link:", reply_markup=keyboard3)
 
 
 def pdf_gen(chat_id):
-    linkedin_file_path = f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.txt'
-    # Open the input file for reading
-    with open(linkedin_file_path, 'r') as input_file:
-        # Read the contents of the file
-        text = input_file.read()
-    # Remove non-ASCII characters from the text
-    text = remove_non_ascii(text)
-    # save FPDF() class into
-    # a variable pdf
-    pdf = FPDF()
-    # Add a page
-    pdf.add_page()
-    # set style and size of font
-    # that you want in the pdf
-    pdf.set_font("Arial", size=15)
-    # insert the texts in pdf
-    for line in text.split('\n'):
-        pdf.cell(200, 10, txt=line, ln=1, align='C')
-    # save the pdf with name .pdf
-    pdf.output(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.pdf')
+    # Path of the input Word document
+    input_file_path = f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{chat_id}.docx'
+    output_file_path = f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{chat_id}.pdf'
+
+    output = pypandoc.convert_file(input_file_path, "pdf", outputfile=output_file_path)
+
     # Sending a file
     bot.send_document(chat_id,
-                      document=open(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/user_info_{chat_id}.pdf', 'rb'))
-    bot.send_message(chat_id, "Try another link:", reply_markup=keyboard3)
+                      document=open(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{chat_id}.pdf', 'rb'))
+    bot.send_message(chat_id, "Try another link:", reply_markup=keyboard2)
 
 
 def remove_non_ascii(text):
