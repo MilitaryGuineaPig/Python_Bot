@@ -31,7 +31,7 @@ def get_all_commits_by_user(username):
             commits_by_week[week_number] += 1
 
     # Set up the plot
-    fig, ax = plt.subplots(figsize=(17, 9))
+    fig, ax = plt.subplots(figsize=(18, 8))
 
     # Add a background image
     bg_image = Image.open("Old_Docs/s.jpeg")
@@ -40,12 +40,12 @@ def get_all_commits_by_user(username):
     ax.bar(range(1, 53), commits_by_week[1:], color='red', alpha=0.5, width=0.5, edgecolor="white", linewidth=0.5)
     # Set the x-axis labels to the week numbers and rotate them 45 degrees
     ax.set_xticks(range(1, 53))
-    ax.set_xticklabels(range(1, 53), rotation=45, fontsize=8)
+    ax.set_xticklabels(range(1, 53), rotation=45, fontsize=14)
 
     # Add a title and axis labels
-    ax.set_title("Commits by week in this year")
-    ax.set_xlabel("Week")
-    ax.set_ylabel("Number of commits")
+    ax.set_title("Commits by week in this year", fontsize=25)
+    ax.set_xlabel("Week", fontsize=25)
+    ax.set_ylabel("Number of commits", fontsize=25)
 
     # Save the plot
     plt.savefig(f"Users_docs/Im_Stat_{username}.png", dpi=300, bbox_inches="tight")

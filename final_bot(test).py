@@ -7,13 +7,14 @@ import docx
 from docx.shared import Cm
 import requests
 import os
+import re
 
 # Read bot credentials from file
 with open('/Users/monkey/Public/Python/Hidden files/LinkedIn_Bot.txt', 'r') as file:
     key = file.readline().rstrip('\n')
     mail = file.readline().rstrip('\n')
     passwd = file.readline().rstrip('\n')
-    git_tok = file.readline().rstrip('\n')
+    # git_tok = file.readline().rstrip('\n')
 
 # Initialize telebot
 bot = telebot.TeleBot(key)
@@ -77,7 +78,8 @@ def get_github_link(message):
 def gitHubFill(message):
     url = message.text
     username = url[len('https://github.com/'):].split('/')[0]
-    g = Github(git_tok)
+    print(username)
+    g = Github("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")
     # Func About Commits
     get_all_commits_by_user(username)
 
@@ -123,7 +125,7 @@ def gitHubFill(message):
     last_paragraph = doc.paragraphs[-1]
     run = last_paragraph.add_run()
 
-    run.add_picture(f'Users_docs/Im_Stat_{username}.png', width=Cm(12), height=Cm(6))
+    run.add_picture(f'Users_docs/Im_Stat_{username}.png', width=Cm(18), height=Cm(8))
     run.add_break()
     run.alignment = 1  # Set the alignment to center
 
@@ -134,12 +136,15 @@ def gitHubFill(message):
 def get_linkedin_link(message):
     linkedin_link = message.text
     if linkedin_link.startswith("https://www.linkedin.com/") or linkedin_link.startswith("www.linkedin.com/"):
-
         # Authenticate using bot account
         api = Linkedin(mail, passwd)
-        parts = linkedin_link.split("/")
-        username = parts[-1]
-        print(username)
+        username_pattern = r"in\/([^\?\/]*)"
+        match = re.search(username_pattern, linkedin_link)
+        if match:
+            username = match.group(1)
+        else:
+            username = None
+
         # GET a profile
         profile = api.get_profile(username)
 
