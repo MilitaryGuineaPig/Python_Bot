@@ -10,7 +10,7 @@ def get_all_commits_by_user(username):
     # Get the list of repositories for the user
     url = f"https://api.github.com/users/{username}/repos"
     repos = requests.get(url).json()
-
+    
     # Initialize a list to store the commits by week
     commits_by_week = [0] * 53
     # Iterate through the repositories

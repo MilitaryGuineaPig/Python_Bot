@@ -14,7 +14,7 @@ with open('/Users/monkey/Public/Python/Hidden files/LinkedIn_Bot.txt', 'r') as f
     key = file.readline().rstrip('\n')
     mail = file.readline().rstrip('\n')
     passwd = file.readline().rstrip('\n')
-    # git_tok = file.readline().rstrip('\n')
+    git_tok = file.readline().rstrip('\n')
 
 # Initialize telebot
 bot = telebot.TeleBot(key)
@@ -79,7 +79,7 @@ def gitHubFill(message):
     url = message.text
     username = url[len('https://github.com/'):].split('/')[0]
     print(username)
-    g = Github("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")
+    g = Github(git_tok)
     # Func About Commits
     get_all_commits_by_user(username)
 
@@ -130,7 +130,7 @@ def gitHubFill(message):
     run.alignment = 1  # Set the alignment to center
 
     # Save the modified document
-    doc.save(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{message.chat.id}.docx')
+    doc.save(f'Users_docs/dossier_{message.chat.id}.docx')
 
 
 def get_linkedin_link(message):
@@ -159,7 +159,7 @@ def get_linkedin_link(message):
             bio = None
 
         # Open the Word document
-        doc = docx.Document(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{message.chat.id}.docx')
+        doc = docx.Document(f'Users_docs/dossier_{message.chat.id}.docx')
 
         # Writing data
         for paragraph in doc.paragraphs:
@@ -193,7 +193,7 @@ def get_linkedin_link(message):
                 paragraph.text = paragraph.text.replace('<education>', education_str)
 
         # Save the modified document
-        doc.save(f'/Users/monkey/Public/Python/Python_Bot/Users_docs/dossier_{message.chat.id}.docx')
+        doc.save(f'Users_docs/dossier_{message.chat.id}.docx')
 
         # Sending a file
         bot.send_document(chat_id=message.chat.id,
